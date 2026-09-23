@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>세전 월급 계산기 (역산기)</title>
+  <title>급여 계산기</title>
+  <meta name="description" content="세전 월급 역산기 및 세후 월급 계산기">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -11,11 +13,14 @@
       --card-bg: rgba(30, 41, 59, 0.7);
       --primary: #3b82f6;
       --primary-hover: #2563eb;
+      --accent: #a855f7;
+      --accent-hover: #9333ea;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --border-color: rgba(255, 255, 255, 0.1);
-      --glass-border: 1px solid rgba(255,255,255,0.15);
-      --glow: 0 0 20px rgba(59, 130, 246, 0.5);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.12);
+      --glow-blue: 0 0 24px rgba(59, 130, 246, 0.55);
+      --glow-purple: 0 0 24px rgba(168, 85, 247, 0.55);
     }
 
     * {
@@ -27,183 +32,312 @@
 
     body {
       background: var(--bg-color);
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.18) 0px, transparent 55%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 55%),
+        radial-gradient(at 50% 100%, rgba(99, 102, 241, 0.12) 0px, transparent 60%);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 2rem;
+      padding: 2.5rem 1.5rem 4rem;
     }
 
-    .container {
-      width: 100%;
-      max-width: 500px;
-      position: relative;
-    }
-
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 2rem;
+    .page-header {
       text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
       background: linear-gradient(to right, #60a5fa, #c084fc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
     }
 
-    .card {
+    .page-header p {
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      width: 100%;
+      max-width: 1100px;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .panels {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
       background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border: var(--glass-border);
       border-radius: 1.5rem;
-      padding: 2.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-title .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 99px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .panel-left .panel-title {
+      color: #60a5fa;
+    }
+
+    .panel-left .badge {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+    }
+
+    .panel-right .panel-title {
+      color: #c084fc;
+    }
+
+    .panel-right .badge {
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
     }
 
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
     }
 
     label {
       display: block;
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       font-weight: 500;
       color: var(--text-muted);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.65);
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      padding: 0.875rem 1rem;
-      border-radius: 0.75rem;
-      font-size: 1rem;
+      padding: 0.8rem 1rem;
+      border-radius: 0.7rem;
+      font-size: 0.95rem;
       transition: all 0.2s ease;
       outline: none;
     }
 
-    input:focus, select:focus {
+    input:focus,
+    select:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
     }
 
-    .btn {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4);
+    .panel-right input:focus,
+    .panel-right select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.18);
     }
 
-    .btn:hover {
-      background: var(--primary-hover);
-      box-shadow: var(--glow);
-      transform: translateY(-2px);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    /* Result Section */
-    #result-section {
-      margin-top: 2rem;
-      display: none;
-      animation: slideUp 0.4s ease-out forwards;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .result-box {
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.2);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .result-title {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-    }
-
-    .result-value {
-      font-size: 2.25rem;
-      font-weight: 700;
-      color: #60a5fa;
-    }
-
-    .breakdown {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      font-size: 0.9rem;
-    }
-
-    .breakdown-item {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.5rem;
-    }
-    
-    .breakdown-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-      font-weight: 600;
-      color: #fb7185;
-      margin-top: 0.5rem;
-    }
-
-    .error-msg {
-      color: #fb7185;
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
-      display: none;
-    }
-
-    /* Formatting helper */
     .input-wrapper {
       position: relative;
       display: flex;
       align-items: center;
     }
+
     .input-wrapper input {
       padding-right: 2.5rem;
     }
+
     .unit {
       position: absolute;
       right: 1rem;
       color: var(--text-muted);
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      padding: 0.95rem;
+      border-radius: 0.75rem;
+      font-size: 0.97rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      margin-top: 0.5rem;
+    }
+
+    .btn-blue {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .btn-blue:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--glow-blue);
+      transform: translateY(-2px);
+    }
+
+    .btn-blue:active {
+      transform: translateY(0);
+    }
+
+    .btn-purple {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+    }
+
+    .btn-purple:hover {
+      background: var(--accent-hover);
+      box-shadow: var(--glow-purple);
+      transform: translateY(-2px);
+    }
+
+    .btn-purple:active {
+      transform: translateY(0);
+    }
+
+    .result-section {
+      margin-top: 1.75rem;
+      display: none;
+      animation: slideUp 0.38s ease-out forwards;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-box {
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .result-box-blue {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+
+    .result-box-purple {
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+
+    .result-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .result-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .result-value-blue {
+      color: #60a5fa;
+    }
+
+    .result-value-purple {
+      color: #c084fc;
+    }
+
+    .breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.875rem;
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .breakdown-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      font-weight: 700;
+      margin-top: 0.4rem;
+    }
+
+    .label-text {
+      color: var(--text-muted);
+    }
+
+    .val-text {
+      font-weight: 500;
+    }
+
+    .total-blue {
+      color: #fb7185;
+    }
+
+    .total-purple {
+      color: #fb7185;
+    }
+
+    .net-purple {
+      color: #34d399;
+      font-weight: 700;
     }
   </style>
 </head>
-<body>
 
-  <div class="container">
-    <h1>세전 월급 역산기</h1>
-    <div class="card">
+<body>
+  <div class="page-header">
+    <h1>급여 계산기</h1>
+    <p>세전 월급 역산 &amp; 세후 실수령액 계산</p>
+  </div>
+  <div class="panels">
+
+    <!-- LEFT: 역산기 -->
+    <div class="panel panel-left">
+      <div class="panel-title">🔁 세전 월급 역산기 <span class="badge">역산</span></div>
       <div class="form-group">
         <label for="target-net">세후 받을 월급</label>
         <div class="input-wrapper">
@@ -211,7 +345,6 @@
           <span class="unit">원</span>
         </div>
       </div>
-
       <div class="form-group">
         <label for="emp-type">근로자 유형</label>
         <select id="emp-type">
@@ -219,10 +352,9 @@
           <option value="ceo">대표자 (고용보험 면제)</option>
         </select>
       </div>
-
       <div class="form-group">
-        <label for="dependents">공제대상가족수 (본인 포함)</label>
-        <select id="dependents">
+        <label for="dependents-rev">공제대상가족수 (본인 포함)</label>
+        <select id="dependents-rev">
           <option value="1" selected>1명 (본인)</option>
           <option value="2">2명</option>
           <option value="3">3명</option>
@@ -236,129 +368,187 @@
           <option value="11">11명 이상</option>
         </select>
       </div>
-
       <div class="form-group">
-        <label for="pension-amt">국민연금 금액 (선택)</label>
+        <label for="pension-amt-rev">국민연금 금액 (선택)</label>
         <div class="input-wrapper">
-          <input type="text" id="pension-amt" placeholder="입력 시 해당 금액 적용" oninput="formatNumber(this)">
-          <span class="unit">원</span>
-        </div>
-        <div id="pension-error" class="error-msg"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="nontaxable-amt">비과세 금액 (선택)</label>
-        <div class="input-wrapper">
-          <input type="text" id="nontaxable-amt" placeholder="예: 200,000" oninput="formatNumber(this)">
+          <input type="text" id="pension-amt-rev" placeholder="미입력 시 자동 계산 (4.5%)" oninput="formatNumber(this)">
           <span class="unit">원</span>
         </div>
       </div>
-
-      <button class="btn" onclick="calculate()">계산하기</button>
-
-      <div id="result-section">
-        <div class="result-box">
-          <div class="result-title">필요한 세전 월급(비과세 제외)</div>
-          <div class="result-value" id="res-gross">0원</div>
+      <div class="form-group">
+        <label for="nontaxable-amt-rev">비과세 금액 (선택)</label>
+        <div class="input-wrapper">
+          <input type="text" id="nontaxable-amt-rev" placeholder="예: 200,000" oninput="formatNumber(this)">
+          <span class="unit">원</span>
         </div>
-        
+      </div>
+      <button class="btn btn-blue" id="btn-reverse" onclick="calculateReverse()">계산하기</button>
+      <div class="result-section" id="result-section-rev">
+        <div class="result-box result-box-blue">
+          <div class="result-title">필요한 세전 월급 (비과세 제외)</div>
+          <div class="result-value result-value-blue" id="rev-res-gross">—</div>
+        </div>
         <div class="breakdown">
-          <div class="breakdown-item">
-            <span>국민연금</span>
-            <span id="b-pension">0원</span>
+          <div class="breakdown-item"><span class="label-text">국민연금</span><span class="val-text"
+              id="rev-b-pension">—</span></div>
+          <div class="breakdown-item"><span class="label-text">건강보험</span><span class="val-text"
+              id="rev-b-health">—</span></div>
+          <div class="breakdown-item"><span class="label-text">요양보험</span><span class="val-text"
+              id="rev-b-care">—</span></div>
+          <div class="breakdown-item"><span class="label-text">고용보험</span><span class="val-text"
+              id="rev-b-employ">—</span></div>
+          <div class="breakdown-item"><span class="label-text">소득세</span><span class="val-text" id="rev-b-tax">—</span>
           </div>
-          <div class="breakdown-item">
-            <span>건강보험</span>
-            <span id="b-health">0원</span>
-          </div>
-          <div class="breakdown-item">
-            <span>요양보험</span>
-            <span id="b-care">0원</span>
-          </div>
-          <div class="breakdown-item">
-            <span>고용보험</span>
-            <span id="b-employ">0원</span>
-          </div>
-          <div class="breakdown-item">
-            <span>소득세</span>
-            <span id="b-tax">0원</span>
-          </div>
-          <div class="breakdown-item">
-            <span>지방소득세</span>
-            <span id="b-localtax">0원</span>
-          </div>
-          <div class="breakdown-item">
-            <span>공제합계</span>
-            <span id="b-total">0원</span>
-          </div>
+          <div class="breakdown-item"><span class="label-text">지방소득세</span><span class="val-text"
+              id="rev-b-localtax">—</span></div>
+          <div class="breakdown-item"><span class="label-text"
+              style="color:var(--text-main);font-weight:700;">공제합계</span><span class="val-text total-blue"
+              id="rev-b-total">—</span></div>
         </div>
       </div>
     </div>
+
+    <!-- RIGHT: 세후 계산기 -->
+    <div class="panel panel-right">
+      <div class="panel-title">💰 세후 월급 계산기 <span class="badge">순정산</span></div>
+      <div class="form-group">
+        <label for="salary">급여</label>
+        <div class="input-wrapper">
+          <input type="text" id="salary" placeholder="예: 3,000,000" oninput="formatNumber(this)">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="bonus">상여</label>
+        <div class="input-wrapper">
+          <input type="text" id="bonus" placeholder="예: 500,000" oninput="formatNumber(this)">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="nontaxable">비과세</label>
+        <div class="input-wrapper">
+          <input type="text" id="nontaxable" placeholder="예: 200,000" oninput="formatNumber(this)">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="pension-fixed">국민연금 (직접 입력)</label>
+        <div class="input-wrapper">
+          <input type="text" id="pension-fixed" placeholder="미입력 시 자동 계산" oninput="formatNumber(this)">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="dependents-fwd">공제대상가족수 (본인 포함)</label>
+        <select id="dependents-fwd">
+          <option value="1" selected>1명 (본인)</option>
+          <option value="2">2명</option>
+          <option value="3">3명</option>
+          <option value="4">4명</option>
+          <option value="5">5명</option>
+          <option value="6">6명</option>
+          <option value="7">7명</option>
+          <option value="8">8명</option>
+          <option value="9">9명</option>
+          <option value="10">10명</option>
+          <option value="11">11명 이상</option>
+        </select>
+      </div>
+      <button class="btn btn-purple" id="btn-forward" onclick="calculateForward()">계산하기</button>
+      <div class="result-section" id="result-section-fwd">
+        <div class="result-box result-box-purple">
+          <div class="result-title">세후 실수령액</div>
+          <div class="result-value result-value-purple" id="fwd-res-net">—</div>
+        </div>
+        <div class="breakdown">
+          <div class="breakdown-item"><span class="label-text">총 지급액</span><span class="val-text"
+              id="fwd-b-gross">—</span></div>
+          <div class="breakdown-item"><span class="label-text">건강보험</span><span class="val-text"
+              id="fwd-b-health">—</span></div>
+          <div class="breakdown-item"><span class="label-text">요양보험</span><span class="val-text"
+              id="fwd-b-care">—</span></div>
+          <div class="breakdown-item"><span class="label-text">국민연금</span><span class="val-text"
+              id="fwd-b-pension">—</span></div>
+          <div class="breakdown-item"><span class="label-text">고용보험</span><span class="val-text"
+              id="fwd-b-employ">—</span></div>
+          <div class="breakdown-item"><span class="label-text">소득세</span><span class="val-text" id="fwd-b-tax">—</span>
+          </div>
+          <div class="breakdown-item"><span class="label-text">지방소득세</span><span class="val-text"
+              id="fwd-b-localtax">—</span></div>
+          <div class="breakdown-item"><span class="label-text"
+              style="color:var(--text-main);font-weight:700;">공제합계</span><span class="val-text total-purple"
+              id="fwd-b-total">—</span></div>
+          <div class="breakdown-item"><span class="label-text"
+              style="color:var(--text-main);font-weight:700;">실수령액</span><span class="val-text net-purple"
+              id="fwd-b-net2">—</span></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="tax_table.js"></script>
   <script>
-    // Constants for 2026
     const HEALTH_RATE = 0.03595;
     const CARE_RATE = 0.1314;
     const EMPLOY_RATE = 0.009;
     const PENSION_RATE = 0.0475;
-
     const TAX_10M = [1507400, 1431570, 1200840, 1170840, 1140840, 1110840, 1080840, 1050840, 1020840, 990840, 960840];
 
-    // Enter 키 입력 시 다음 칸으로 이동
     document.addEventListener('DOMContentLoaded', () => {
-      const focusableElements = Array.from(document.querySelectorAll('input, select, button.btn'));
-      focusableElements.forEach((el, index) => {
-        el.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            if (el.tagName.toLowerCase() === 'button') {
-              el.click();
-            } else {
-              const nextEl = focusableElements[index + 1];
-              if (nextEl) {
-                nextEl.focus();
+      // 패널별 Enter 순서: 마지막 input/select에서 엔터 → 계산 버튼 클릭
+      document.querySelectorAll('.panel').forEach(panel => {
+        const fields = Array.from(panel.querySelectorAll('input, select'));
+        const calcBtn = panel.querySelector('button.btn');
+
+        fields.forEach((el, idx) => {
+          // + 키 → 000 추가 (input에만)
+          if (el.tagName.toLowerCase() === 'input') {
+            el.addEventListener('keydown', e => {
+              if (e.key === '+') {
+                e.preventDefault();
+                const raw = el.value.replace(/[^\d]/g, '');
+                const newVal = (raw || '0') + '000';
+                el.value = parseInt(newVal, 10).toLocaleString('ko-KR');
               }
-            }
+            });
           }
+
+          // Enter → 다음 필드 or 계산 버튼
+          el.addEventListener('keydown', e => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            const next = fields[idx + 1];
+            if (next) { next.focus(); }
+            else if (calcBtn) { calcBtn.click(); }
+          });
         });
       });
     });
 
     function formatNumber(input) {
       let val = input.value.replace(/[^\d]/g, '');
-      if (val) {
-        input.value = parseInt(val, 10).toLocaleString('ko-KR');
-      } else {
-        input.value = '';
-      }
+      input.value = val ? parseInt(val, 10).toLocaleString('ko-KR') : '';
     }
 
-    function getRawValue(id) {
-      let val = document.getElementById(id).value.replace(/[^\d]/g, '');
+    function getRaw(id) {
+      const val = document.getElementById(id).value.replace(/[^\d]/g, '');
       return val ? parseInt(val, 10) : null;
     }
 
-    // 소득세 계산 함수
+    const f = v => v.toLocaleString('ko-KR') + '원';
+    const truncate10 = v => Math.floor(v / 10) * 10;
+
     function getIncomeTax(gross, dependents) {
       let depIdx = Math.min(dependents, 11) - 1;
-      
       if (gross <= 10000000) {
-        // Find in TAX_BRACKETS
         let bracket = TAX_BRACKETS.find(b => gross >= b.min && gross < b.max);
         if (bracket) return bracket.taxes[depIdx];
-        
-        // Edge case: Exactly 10M won (handled above if upper bound is inclusive/exclusive)
-        // Usually ranges are "이상 미만"
         if (gross === 10000000) return TAX_10M[depIdx];
         return 0;
       }
-
-      // Over 10M logic
-      let baseTax = TAX_10M[depIdx];
-      let excess = 0;
-      
+      let baseTax = TAX_10M[depIdx], excess = 0;
       if (gross <= 14000000) {
         excess = gross - 10000000;
         return baseTax + Math.floor(excess * 0.98 * 0.35) + 25000;
@@ -380,86 +570,82 @@
       }
     }
 
-    function calculateDeductions(gross, dependents, fixedPension, nonTaxable, isCEO) {
-      // 1. 원단위 절사 (floor down to 10s)
-      let truncate10 = val => Math.floor(val / 10) * 10;
-
-      let taxable = Math.max(0, gross - nonTaxable);
-
-      let pension = fixedPension !== null ? fixedPension : truncate10(taxable * PENSION_RATE);
-      let health = truncate10(taxable * HEALTH_RATE);
-      let care = truncate10(health * CARE_RATE);
-      let employ = isCEO ? 0 : truncate10(taxable * EMPLOY_RATE);
-      
-      let tax = getIncomeTax(taxable, dependents);
-      // 소득세 원단위 절사 (보통 표에 이미 되어있으나 혹시나 해서)
-      tax = truncate10(tax);
-      let localTax = truncate10(tax * 0.1);
-
-      let totalDeduct = pension + health + care + employ + tax + localTax;
-      let net = gross - totalDeduct;
-
-      return {
-        gross, taxable, nonTaxable, pension, health, care, employ, tax, localTax, totalDeduct, net
-      };
+    function calcDeductions({ taxable, fixedPension, dependents, isCEO }) {
+      const pension = fixedPension !== null ? fixedPension : truncate10(taxable * PENSION_RATE);
+      const health = truncate10(taxable * HEALTH_RATE);
+      const care = truncate10(health * CARE_RATE);
+      const employ = isCEO ? 0 : truncate10(taxable * EMPLOY_RATE);
+      const tax = truncate10(getIncomeTax(taxable, dependents));
+      const localTax = truncate10(tax * 0.1);
+      const total = pension + health + care + employ + tax + localTax;
+      return { pension, health, care, employ, tax, localTax, total };
     }
 
-    function calculate() {
-      let targetNet = getRawValue('target-net');
-      if (!targetNet) {
-        alert("세후 받을 월급을 입력해주세요.");
-        return;
-      }
-      let dependents = parseInt(document.getElementById('dependents').value, 10);
-      let fixedPension = getRawValue('pension-amt');
-      let nonTaxable = getRawValue('nontaxable-amt') || 0;
-      let isCEO = document.getElementById('emp-type').value === 'ceo';
+    function calculateReverse() {
+      const targetNet = getRaw('target-net');
+      if (!targetNet) { alert('세후 받을 월급을 입력해주세요.'); return; }
+      const dependents = parseInt(document.getElementById('dependents-rev').value, 10);
+      const fixedPension = getRaw('pension-amt-rev');
+      const nonTaxable = getRaw('nontaxable-amt-rev') || 0;
+      const isCEO = document.getElementById('emp-type').value === 'ceo';
 
-      // Binary Search
-      let low = targetNet;
-      let high = targetNet * 3; // safe upper bound
-      let bestMatch = null;
-      
+      let low = targetNet, high = targetNet * 3, bestMatch = null;
       while (low <= high) {
-        let mid = Math.floor((low + high) / 2);
-        let res = calculateDeductions(mid, dependents, fixedPension, nonTaxable, isCEO);
-        
-        if (res.net === targetNet) {
-          bestMatch = res;
-          // To find the *minimum* gross that gives this net, we could go lower,
-          // but since tax tables can cause slight plateaus, let's just step down by 10
-          high = mid - 1; 
-        } else if (res.net < targetNet) {
-          low = mid + 1;
-        } else {
-          high = mid - 1;
-        }
+        const mid = Math.floor((low + high) / 2);
+        const taxable = Math.max(0, mid - nonTaxable);
+        const d = calcDeductions({ taxable, fixedPension, dependents, isCEO });
+        const net = mid - d.total;
+        if (net === targetNet) { bestMatch = { gross: mid, taxable, ...d, net }; high = mid - 1; }
+        else if (net < targetNet) { low = mid + 1; }
+        else { high = mid - 1; }
       }
-
-      // if exact match not found (rare, but possible due to truncation steps missing a single won value),
-      // pick the closest one that guarantees AT LEAST the target net
       if (!bestMatch) {
-        // Let's recalculate with 'low' which will be >= targetNet
-        bestMatch = calculateDeductions(low, dependents, fixedPension, nonTaxable, isCEO);
+        const taxable = Math.max(0, low - nonTaxable);
+        const d = calcDeductions({ taxable, fixedPension, dependents, isCEO });
+        bestMatch = { gross: low, taxable, ...d, net: low - d.total };
       }
 
-      displayResult(bestMatch);
+      const s = document.getElementById('result-section-rev');
+      s.style.display = 'block'; s.style.animation = 'none';
+      requestAnimationFrame(() => { s.style.animation = ''; });
+      document.getElementById('rev-res-gross').innerText = f(bestMatch.taxable);
+      document.getElementById('rev-b-pension').innerText = f(bestMatch.pension);
+      document.getElementById('rev-b-health').innerText = f(bestMatch.health);
+      document.getElementById('rev-b-care').innerText = f(bestMatch.care);
+      document.getElementById('rev-b-employ').innerText = f(bestMatch.employ);
+      document.getElementById('rev-b-tax').innerText = f(bestMatch.tax);
+      document.getElementById('rev-b-localtax').innerText = f(bestMatch.localTax);
+      document.getElementById('rev-b-total').innerText = f(bestMatch.total);
     }
 
-    function displayResult(res) {
-      document.getElementById('result-section').style.display = 'block';
-      
-      const f = v => v.toLocaleString('ko-KR') + '원';
+    function calculateForward() {
+      const salary = getRaw('salary');
+      if (!salary) { alert('급여를 입력해주세요.'); return; }
+      const bonus = getRaw('bonus') || 0;
+      const nonTaxable = getRaw('nontaxable') || 0;
+      const fixedPension = getRaw('pension-fixed');
+      const dependents = parseInt(document.getElementById('dependents-fwd').value, 10);
 
-      document.getElementById('res-gross').innerText = f(res.taxable);
-      document.getElementById('b-pension').innerText = f(res.pension);
-      document.getElementById('b-health').innerText = f(res.health);
-      document.getElementById('b-care').innerText = f(res.care);
-      document.getElementById('b-employ').innerText = f(res.employ);
-      document.getElementById('b-tax').innerText = f(res.tax);
-      document.getElementById('b-localtax').innerText = f(res.localTax);
-      document.getElementById('b-total').innerText = f(res.totalDeduct);
+      const gross = salary + bonus;              // 급여+상여 (4대보험·소득세 기준)
+      const d = calcDeductions({ taxable: gross, fixedPension, dependents, isCEO: false });
+      const net = gross - d.total + nonTaxable;    // 비과세는 공제 후 그냥 더함
+      const totalPay = gross + nonTaxable;          // 총 지급액 (비과세 포함)
+
+      const s = document.getElementById('result-section-fwd');
+      s.style.display = 'block'; s.style.animation = 'none';
+      requestAnimationFrame(() => { s.style.animation = ''; });
+      document.getElementById('fwd-res-net').innerText = f(net);
+      document.getElementById('fwd-b-gross').innerText = f(totalPay);
+      document.getElementById('fwd-b-health').innerText = f(d.health);
+      document.getElementById('fwd-b-care').innerText = f(d.care);
+      document.getElementById('fwd-b-pension').innerText = f(d.pension);
+      document.getElementById('fwd-b-employ').innerText = f(d.employ);
+      document.getElementById('fwd-b-tax').innerText = f(d.tax);
+      document.getElementById('fwd-b-localtax').innerText = f(d.localTax);
+      document.getElementById('fwd-b-total').innerText = f(d.total);
+      document.getElementById('fwd-b-net2').innerText = f(net);
     }
   </script>
 </body>
+
 </html>
