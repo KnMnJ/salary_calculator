@@ -325,6 +325,16 @@
       color: #34d399;
       font-weight: 700;
     }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .form-row .form-group {
+      margin-bottom: 0;
+    }
   </style>
 </head>
 
@@ -353,6 +363,20 @@
         </select>
       </div>
       <div class="form-group">
+        <label for="pension-amt-rev">국민연금 금액 (선택)</label>
+        <div class="input-wrapper">
+          <input type="text" id="pension-amt-rev" placeholder="미입력 시 자동 계산 (4.5%)" oninput="formatNumber(this)">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="nontaxable-amt-rev">비과세 금액 (선택)</label>
+        <div class="input-wrapper">
+          <input type="text" id="nontaxable-amt-rev" placeholder="예: 200,000" oninput="formatNumber(this)">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="form-group">
         <label for="dependents-rev">공제대상가족수 (본인 포함)</label>
         <select id="dependents-rev">
           <option value="1" selected>1명 (본인)</option>
@@ -367,20 +391,6 @@
           <option value="10">10명</option>
           <option value="11">11명 이상</option>
         </select>
-      </div>
-      <div class="form-group">
-        <label for="pension-amt-rev">국민연금 금액 (선택)</label>
-        <div class="input-wrapper">
-          <input type="text" id="pension-amt-rev" placeholder="미입력 시 자동 계산 (4.5%)" oninput="formatNumber(this)">
-          <span class="unit">원</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="nontaxable-amt-rev">비과세 금액 (선택)</label>
-        <div class="input-wrapper">
-          <input type="text" id="nontaxable-amt-rev" placeholder="예: 200,000" oninput="formatNumber(this)">
-          <span class="unit">원</span>
-        </div>
       </div>
       <button class="btn btn-blue" id="btn-reverse" onclick="calculateReverse()">계산하기</button>
       <div class="result-section" id="result-section-rev">
@@ -411,19 +421,28 @@
     <!-- RIGHT: 세후 계산기 -->
     <div class="panel panel-right">
       <div class="panel-title">💰 세후 월급 계산기 <span class="badge">순정산</span></div>
-      <div class="form-group">
-        <label for="salary">급여</label>
-        <div class="input-wrapper">
-          <input type="text" id="salary" placeholder="예: 3,000,000" oninput="formatNumber(this)">
-          <span class="unit">원</span>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="salary">급여</label>
+          <div class="input-wrapper">
+            <input type="text" id="salary" placeholder="예: 3,000,000" oninput="formatNumber(this)">
+            <span class="unit">원</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="bonus">상여</label>
+          <div class="input-wrapper">
+            <input type="text" id="bonus" placeholder="예: 500,000" oninput="formatNumber(this)">
+            <span class="unit">원</span>
+          </div>
         </div>
       </div>
-      <div class="form-group">
-        <label for="bonus">상여</label>
-        <div class="input-wrapper">
-          <input type="text" id="bonus" placeholder="예: 500,000" oninput="formatNumber(this)">
-          <span class="unit">원</span>
-        </div>
+      <div class="form-group" style="margin-top:1.2rem;">
+        <label for="emp-type-fwd">근로자 유형</label>
+        <select id="emp-type-fwd">
+          <option value="employee" selected>직원</option>
+          <option value="ceo">대표자 (고용보험 면제)</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="nontaxable">비과세</label>
@@ -627,7 +646,8 @@
       const dependents = parseInt(document.getElementById('dependents-fwd').value, 10);
 
       const gross = salary + bonus;              // 급여+상여 (4대보험·소득세 기준)
-      const d = calcDeductions({ taxable: gross, fixedPension, dependents, isCEO: false });
+      const isCEO = document.getElementById('emp-type-fwd').value === 'ceo';
+      const d = calcDeductions({ taxable: gross, fixedPension, dependents, isCEO });
       const net = gross - d.total + nonTaxable;    // 비과세는 공제 후 그냥 더함
       const totalPay = gross + nonTaxable;          // 총 지급액 (비과세 포함)
 
