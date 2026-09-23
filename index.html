@@ -356,25 +356,25 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="emp-type">근로자 유형</label>
-        <select id="emp-type">
-          <option value="employee" selected>직원</option>
-          <option value="ceo">대표자 (고용보험 면제)</option>
-        </select>
+        <label for="nontaxable-amt-rev">비과세</label>
+        <div class="input-wrapper">
+          <input type="text" id="nontaxable-amt-rev" placeholder="예: 200,000" oninput="formatNumber(this)">
+          <span class="unit">원</span>
+        </div>
       </div>
       <div class="form-group">
-        <label for="pension-amt-rev">국민연금 금액 (선택)</label>
+        <label for="pension-amt-rev">국민연금 (선택)</label>
         <div class="input-wrapper">
           <input type="text" id="pension-amt-rev" placeholder="미입력 시 자동 계산 (4.5%)" oninput="formatNumber(this)">
           <span class="unit">원</span>
         </div>
       </div>
       <div class="form-group">
-        <label for="nontaxable-amt-rev">비과세 금액 (선택)</label>
-        <div class="input-wrapper">
-          <input type="text" id="nontaxable-amt-rev" placeholder="예: 200,000" oninput="formatNumber(this)">
-          <span class="unit">원</span>
-        </div>
+        <label for="emp-type">근로자 유형</label>
+        <select id="emp-type">
+          <option value="employee" selected>직원</option>
+          <option value="ceo">대표자 (고용보험 면제)</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="dependents-rev">공제대상가족수 (본인 포함)</label>
@@ -438,13 +438,6 @@
         </div>
       </div>
       <div class="form-group" style="margin-top:1.2rem;">
-        <label for="emp-type-fwd">근로자 유형</label>
-        <select id="emp-type-fwd">
-          <option value="employee" selected>직원</option>
-          <option value="ceo">대표자 (고용보험 면제)</option>
-        </select>
-      </div>
-      <div class="form-group">
         <label for="nontaxable">비과세</label>
         <div class="input-wrapper">
           <input type="text" id="nontaxable" placeholder="예: 200,000" oninput="formatNumber(this)">
@@ -452,11 +445,18 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="pension-fixed">국민연금 (직접 입력)</label>
+        <label for="pension-fixed">국민연금 (선택)</label>
         <div class="input-wrapper">
           <input type="text" id="pension-fixed" placeholder="미입력 시 자동 계산" oninput="formatNumber(this)">
           <span class="unit">원</span>
         </div>
+      </div>
+      <div class="form-group">
+        <label for="emp-type-fwd">근로자 유형</label>
+        <select id="emp-type-fwd">
+          <option value="employee" selected>직원</option>
+          <option value="ceo">대표자 (고용보험 면제)</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="dependents-fwd">공제대상가족수 (본인 포함)</label>
